@@ -1,0 +1,11 @@
+annotations/
+.idea/
+.venv/
+__pycache__/
+CleanImageNet/
+cleanset/
+dbs/
+test images/
+train2017/
+val2017/
+wandb/
