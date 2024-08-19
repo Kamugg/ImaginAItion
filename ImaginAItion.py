@@ -14,7 +14,7 @@ from PyQt5 import QtWidgets
 from PyQt5.QtCore import QSettings
 from PyQt5.QtGui import QImage, QPixmap, QCloseEvent, QIcon
 from PyQt5.QtWidgets import QFileDialog, QMessageBox, QMainWindow, QListWidgetItem
-from torchvision.models.segmentation import deeplabv3_resnet101
+from torchvision.models.segmentation import deeplabv3_resnet101, DeepLabV3_ResNet101_Weights
 from torchvision.transforms import Normalize, Resize
 from torchvision.transforms import PILToTensor
 from transformers import CLIPVisionModelWithProjection, AutoProcessor
@@ -67,9 +67,31 @@ class AppMainWindow(QMainWindow):
 
         self.uploadImg.clicked.connect(self.upload_image)
 
+        # Check if models are present, download them if needed
+        if not Path('models/deeplab.pth').is_file():
+            self.deeplab = deeplabv3_resnet101(weights=DeepLabV3_ResNet101_Weights.DEFAULT, progress=False,
+                                               aux_loss=True)
+            torch.save(self.deeplab.state_dict(), 'models/deeplab.pth')
+
+        if not Path('models/deeplab_preprocessing.pkl').is_file():
+            with open('models/deeplab_preprocessing.pkl', 'wb') as f:
+                pickle.dump(DeepLabV3_ResNet101_Weights.DEFAULT.transforms, f)
+
+        if not Path('models/deeplab_classes.pkl').is_file():
+            with open('models/deeplab_classes.pkl', 'wb') as f:
+                pickle.dump(DeepLabV3_ResNet101_Weights.DEFAULT.meta, f)
+
+        if not Path('models/clip_embedder').is_dir():
+            self.CLIPEmbedder = CLIPVisionModelWithProjection.from_pretrained("openai/clip-vit-base-patch32")
+            self.CLIPEmbedder.save_pretrained("models/clip_embedder")
+
+        if not Path('models/clip_processor').is_dir():
+            self.CLIPProcessor = AutoProcessor.from_pretrained("openai/clip-vit-base-patch32")
+            self.CLIPProcessor.save_pretrained("models/clip_processor")
+
         # Load deeplab
 
-        self.deeplab = deeplabv3_resnet101(weights=None, progress=False, aux_loss=True)
+        self.deeplab = deeplabv3_resnet101(weights=DeepLabV3_ResNet101_Weights.DEFAULT, progress=False, aux_loss=True)
         self.deeplab.load_state_dict(torch.load('models/deeplab.pth'))
         self.deeplab.cpu()
 

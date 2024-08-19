@@ -254,7 +254,7 @@ class MultimediaDB(object):
             - Calls the provided callbacks to report progress and status throughout the process.
         """
         BATCH_SIZE = 64
-        necessary_steps = len(os.listdir(folder)) + len(os.listdir('dbs/db_images'))
+        necessary_steps = len(os.listdir(folder))
         current_step = 0
 
         # Setting all models to evaluation mode
@@ -264,23 +264,34 @@ class MultimediaDB(object):
         autoencoder.eval()
         autoencoder.to(device='cuda')
 
-        # Delete all db stored images
-
-        db_path = Path('dbs/db_images')
-        for file in os.listdir(db_path):
-            status_callback(f'Deleting {file}')
-            file_path = db_path / file
-            os.unlink(file_path)
-            current_step += 1
-            progress_callback(round(100 * (current_step / necessary_steps)))
-
-        # Delete all indexes
+        # Delete all db files
 
         db_path = Path('dbs')
-        for file in os.listdir(db_path):
-            file_path = db_path / file
-            if file_path.is_file():
-                os.unlink(file_path)
+        db_image_path = Path('dbs/db_images')
+        if db_path.is_dir():
+
+            # Delete all db stored images
+
+            if db_image_path.is_dir():
+                necessary_steps += len(os.listdir(db_image_path))
+                for file in os.listdir(db_image_path):
+                    status_callback(f'Deleting {file}')
+                    file_path = db_image_path / file
+                    os.unlink(file_path)
+                    current_step += 1
+                    progress_callback(round(100 * (current_step / necessary_steps)))
+            else:
+                os.mkdir(db_image_path)
+
+            # Delete all indexes
+
+            for file in os.listdir(db_path):
+                file_path = db_path / file
+                if file_path.is_file():
+                    os.unlink(file_path)
+        else:
+            os.mkdir(db_path)
+            os.mkdir(db_image_path)
 
         # Move all images and create new index
 
@@ -288,10 +299,10 @@ class MultimediaDB(object):
 
         for i, file in enumerate(os.listdir(folder)):
             status_callback(f'Copying {file}')
-            db_path = Path('dbs/db_images') / file
-            self.path_index[i] = str(db_path)
+            t_path = Path('dbs/db_images') / file
+            self.path_index[i] = str(t_path)
             src = Path(folder) / file
-            shutil.copy(src, db_path)
+            shutil.copy(src, t_path)
             current_step += 1
             progress_callback(round(100 * (current_step / necessary_steps)))
 
@@ -317,7 +328,7 @@ class MultimediaDB(object):
 
             for k, batch in enumerate(batches):
 
-                status_callback(f'Computing embeddings... (batch {computed_files}/{max_id})')
+                status_callback(f'Computing embeddings... (files {computed_files}/{max_id})')
 
                 # Semantic embeds
 
@@ -372,6 +383,10 @@ class MultimediaDB(object):
 
         with open('dbs/path_index.json', 'w') as f:
             json.dump(self.path_index, f)
+
+        # Update DB status
+
+        self.status_ok = self.check_file_integrity()
 
     def add(self, path: Path, semantic_embeds: np.ndarray, content_embeds: np.ndarray):
         """
