@@ -9,3 +9,16 @@ test images/
 train2017/
 val2017/
 wandb/
+defective.json
+*.ipynb
+models/clip_embedder/config.json
+models/clip_embedder/model.safetensors
+models/clip_processor/merges.txt
+models/clip_processor/preprocessor_config.json
+models/clip_processor/special_tokens_map.json
+models/clip_processor/tokenizer.json
+models/clip_processor/tokenizer_config.json
+models/clip_processor/vocab.json
+models/deeplab.pth
+models/deeplab_classes.pkl
+models/deeplab_preprocessing.pkl
