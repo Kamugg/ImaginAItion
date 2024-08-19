@@ -24,7 +24,7 @@ by MaxPool downsampling. The upsampling strategy of the decoder is implemented w
   <img src="res/assets/readme_images/autoencoder.png" alt="">
   <figcaption><i>Autoencoder architecture</i></figcaption>
 </figure>
-
+<br>
 The model was trained on [TinyImageNet](https://www.kaggle.com/datasets/akash2sharma/tiny-imagenet) and accepts 3x64x64 images normalized with mean and std computed on the dataset training set.
 
 ## Similarity search
@@ -44,12 +44,12 @@ Once an image is loaded in the app the user can browse the various detected segm
   <img src="res/assets/readme_images/loaded_image.png" alt="">
   <figcaption><i>Main window with an image loaded</i></figcaption>
 </figure>
-
+<br>
 <figure>
   <img src="res/assets/readme_images/masked_image.png" alt="">
   <figcaption><i>Segmentation mask inspection</i></figcaption>
 </figure>
-
+<br>
 Pressing the "Add to database" button will store the image's relevant data to the FAISS indexes, while pressing "Search similar images"
 will trigger the database query.
 
@@ -75,16 +75,17 @@ Here there are some results for the image shown above.
   <img src="res/assets/readme_images/intersection.png" alt="">
   <figcaption><i>First results are the one retrieved by both indexes, and are fairly accurate</i></figcaption>
 </figure>
-
+<br>
 <figure>
   <img src="res/assets/readme_images/semantic_similarity.png" alt="">
   <figcaption><i>Followed by the semantic-only results</i></figcaption>
 </figure>
-
+<br>
 <figure>
   <img src="res/assets/readme_images/content_similarity.png" alt="">
   <figcaption><i>And lastly there are the content-only results that tend to be fairly imprecise</i></figcaption>
 </figure>
+<br>
 
 ## The settings
 
@@ -95,6 +96,7 @@ of the application
   <img src="res/assets/readme_images/settings.png" alt="">
   <figcaption><i>The settings window</i></figcaption>
 </figure>
+<br>
 
 From this window the user can:
 
@@ -114,6 +116,6 @@ Clicking on the "Reset/Initialize database" button will open the following windo
   <img src="res/assets/readme_images/database_reset.png" alt="">
   <figcaption><i>The reset database window</i></figcaption>
 </figure>
-
+<br>
 Upon choosing a folder **that contains only images** the ap will copy them, compute their representation and store them in the faiss indexes.
 When this window closes the database is ready to be used.
